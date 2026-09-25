@@ -1,0 +1,23 @@
+ML models:
+Average error of linear regression: 35.71$
+Average error of linear regression with NLP: 38.98$
+Average error of random forest with NLP: 29.98$
+Average error of XGBoost with NLP: 31.60$
+----------------------------------------------
+DL models:
+Average error of vanilla NN: 30.46$
+Average error of DNN: 27.23$
+----------------------------------------------
+LLMs:
+Average error of LLM-GPT-4.1: 28.53$
+Average error of LLM-GPT-5.1: 15.87$
+Average error of LLM-LLAMA-Base: 38.68$
+----------------------------------------------
+Fine-tuning:
+Average error of LLM-LLAMA-Fine-Tuned: 24.94$
+----------------------------------------------
+RAG model:
+Average error of LLM-RAG: 12.97$
+----------------------------------------------
+Ensemble model:
+Average error of Ensemble: 11.69$

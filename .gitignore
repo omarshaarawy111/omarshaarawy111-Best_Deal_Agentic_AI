@@ -1,0 +1,82 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local runtime state
+runtime/
+*.log
+
+# Local databases and database exports
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Large model artifacts
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.safetensors
+*.onnx
+
+# Serialized caches and model artifacts
+*.pkl
+*.pickle
+
+# RAG generated artifacts
+artifacts/rag/
+preprocessed_db/
+RAG_chunks/
+RAG_eval/
+bm25_index.pkl
+
+# Generated ML / experiment artifacts
+artifacts/models/
+artifacts/metrics/
+artifacts/reports/
+wandb/
+
+# OpenAI batch and temporary outputs
+batch_outputs/
+openai_batches/
+*.jsonl
+
+# Local caches
+.cache/
+.huggingface/
+
+# OS files
+.DS_Store
+Thumbs.db
