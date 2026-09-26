@@ -1,66 +1,327 @@
 # Best Deal
 
-Best Deal is an AI/ML multi-agent deal detection and price-estimation project. The current repository stage converts the reusable parts of the research notebooks into a clean `src` package while keeping expensive research and training artifacts outside the application startup path.
+> An AI-powered multi-agent system for product price estimation and intelligent deal detection.
 
-> **Current entry point:** `src/best_deal/main.py`  
-> The filename is intentionally kept for continuity with the existing Gradio application, while the project name is **Best Deal**.
+Best Deal is an end-to-end AI/ML project designed to answer a simple but challenging question:
 
-## 1. What this migration does
+**Is this product actually a good deal?**
 
-The migration follows one rule:
+Instead of looking only at the current product price, Best Deal estimates the product's fair value using multiple AI/ML approaches, combines their predictions, and compares the estimated value with the current price.
 
-> **A notebook records experiments and discoveries. `src` contains reusable behavior required by the system.**
+The project combines **Machine Learning, Deep Learning, LLMs, RAG, and Multi-Agent Systems** into a single application.
 
-That means the project does **not** convert every notebook into a Python file. Reusable pipeline code is extracted, while experiments, EDA, charts, one-off comparisons, and completed training runs remain in notebooks.
+---
 
-### Source layout
+## What Problem Does It Solve?
+
+A low price does not necessarily mean a product is a good deal.
+
+A product may appear discounted while still being expensive compared with similar products or its estimated market value.
+
+Best Deal approaches the problem by estimating a product's expected value and measuring the difference between that value and its current price.
+
+```text
+Product
+   |
+   v
+Product Information + Current Price
+   |
+   v
++-------------------------------+
+|       Pricing Agents          |
+|                               |
+|  DNN   RAG   Fine-Tuned Model |
++-------------------------------+
+   |
+   v
+Multiple Price Estimates
+   |
+   v
+Ensemble / Regression
+   |
+   v
+Estimated Fair Value
+   |
+   v
+Deal Evaluation
+   |
+   v
+Genuine Deal Candidate
+```
+
+---
+
+## How Best Deal Works
+
+The system combines several pricing approaches rather than relying on a single model.
+
+### 1. Data Pipeline
+
+The project starts with product data that goes through a structured data pipeline:
+
+```text
+Raw Data
+   |
+   v
+Data Collection
+   |
+   v
+Data Cleaning
+   |
+   v
+Feature Engineering
+   |
+   v
+Validation
+   |
+   v
+Model-Ready Data
+```
+
+The research notebooks contain the exploratory analysis and experiments, while reusable data-processing logic is implemented inside the `src` package.
+
+---
+
+### 2. Machine Learning
+
+Classical regression models were used as baseline approaches.
+
+The ML workflow includes:
+
+- Data preprocessing
+- Feature engineering
+- Baseline models
+- Cross-validation
+- Hyperparameter tuning
+- Model evaluation
+- Model comparison
+
+These experiments establish measurable baselines before introducing more advanced models.
+
+---
+
+### 3. Deep Neural Network
+
+A Deep Neural Network is used as one of the pricing agents.
+
+The source code contains the model architecture and inference logic, while the trained checkpoint is kept outside Git because of its size.
+
+```text
+Product
+   |
+   v
+DNN Inference
+   |
+   v
+Estimated Price
+```
+
+---
+
+### 4. Fine-Tuned Model
+
+A language model was fine-tuned specifically for the product price-estimation task.
+
+The training process was performed remotely.
+
+The application does not retrain the model during normal execution.
+
+Instead, the existing trained model is accessed through an integration layer:
+
+```text
+Specialist Agent
+      |
+      v
+Remote Fine-Tuned Model
+      |
+      v
+Estimated Price
+```
+
+---
+
+### 5. RAG Pricing Agent
+
+The RAG agent retrieves relevant product information before generating a price estimate.
+
+The pipeline includes:
+
+```text
+Product Query
+     |
+     v
+Query Rewriting
+     |
+     +----------------+
+     |                |
+     v                v
+Original Query   Rewritten Query
+     |                |
+     +--------+-------+
+              |
+              v
+       Hybrid Retrieval
+        /            \
+       v              v
+  Dense Search      BM25
+        \            /
+         \          /
+          v        v
+        RRF Fusion
+             |
+             v
+          Reranker
+             |
+             v
+       Relevant Context
+             |
+             v
+       Structured LLM
+             |
+             v
+       Estimated Price
+```
+
+The RAG implementation is divided into independent modules for loading, splitting, embeddings, vector search, BM25, retrieval, reranking, generation, ingestion, and evaluation.
+
+---
+
+## Multi-Agent Architecture
+
+The different pricing approaches are exposed through specialized agents.
+
+```text
+                 Agent Framework
+                        |
+                        v
+             Autonomous Planning
+                        |
+                        v
+                  Deal Scanner
+                        |
+                        v
+                 Ensemble Agent
+                  /     |      \
+                 /      |       \
+                v       v        v
+              RAG      DNN    Specialist
+               |        |         |
+               v        v         v
+            Estimate Estimate  Estimate
+                 \       |       /
+                  \      |      /
+                   v     v     v
+                    Ensemble
+                       |
+                       v
+                 Deal Evaluation
+                       |
+                       v
+                Messaging Agent
+                       |
+                       v
+                    Pushover
+```
+
+The agent architecture separates:
+
+- Model-specific inference
+- Agent orchestration
+- Deal evaluation
+- Notification delivery
+
+This allows the individual AI components to evolve independently.
+
+---
+
+## RAG Evaluation
+
+The RAG system has a dedicated evaluation pipeline.
+
+A frozen golden dataset is used to evaluate retrieval and pricing behavior.
+
+```text
+Golden Dataset
+      |
+      v
+RAG Evaluation
+      |
+      +--> Retrieval Metrics
+      |
+      +--> Price Metrics
+      |
+      +--> Category Metrics
+      |
+      v
+Aggregated Results
+      |
+      v
+Evaluation Dashboard
+```
+
+The evaluation logic is separated from the Gradio dashboard so that it can later be reused by automated evaluation jobs, CI/CD, or an admin backend.
+
+---
+
+## Technology Stack
+
+| Area | Technology |
+|---|---|
+| Language | Python |
+| Machine Learning | Scikit-learn |
+| Deep Learning | PyTorch |
+| LLM / RAG | LLM APIs, Chroma, BM25 |
+| Fine-Tuning | Remote fine-tuning infrastructure |
+| Agent Architecture | Custom Multi-Agent System |
+| Interface | Gradio |
+| Notifications | Pushover |
+| Dataset Management | Hugging Face Datasets |
+| Experiment Tracking | Weights & Biases |
+| Version Control | Git / GitHub |
+| Planned Backend | FastAPI |
+| Planned Database | PostgreSQL / Supabase |
+| Planned Frontend | Next.js / TypeScript |
+| Planned Deployment | Docker / Azure |
+
+---
+
+## Project Structure
+
+The application uses a Python `src` layout:
 
 ```text
 src/
 └── best_deal/
-    ├── __init__.py
-    ├── config.py
-    ├── main.py              # Gradio application entry point
-    │
+    ├── main.py
+
     ├── agents/
-    │   ├── agent.py                   # shared agent behavior and logging
-    │   ├── deals.py                   # deal scraping + domain models
-    │   ├── preprocessor.py            # lightweight LLM preprocessing
-    │   ├── scanner_agent.py            # deal discovery and selection
-    │   ├── frontier_agent.py           # thin RAG adapter
-    │   ├── specialist_agent.py         # thin Modal fine-tuned-model adapter
-    │   ├── neural_network_agent.py     # thin DNN inference adapter
-    │   ├── ensemble_agent.py            # specialist orchestration
-    │   ├── messaging_agent.py           # Pushover notifications
-    │   ├── planning_agent.py            # deterministic planning baseline
-    │   ├── autonomous_planning_agent.py # current tool-calling planner
-    │   └── framework.py                 # runtime lifecycle + memory
-    │
+    │   ├── framework.py
+    │   ├── scanner_agent.py
+    │   ├── ensemble_agent.py
+    │   ├── frontier_agent.py
+    │   ├── specialist_agent.py
+    │   ├── neural_network_agent.py
+    │   └── messaging_agent.py
+
     ├── data/
-    │   ├── models.py                   # Item data model
-    │   ├── collection.py               # Hugging Face collection
-    │   ├── preprocessing.py            # cleaning + feature engineering
-    │   ├── validation.py               # reusable data validation
-    │   └── llm_batch.py                # explicit OpenAI batch workflow
-    │
+    │   ├── models.py
+    │   ├── collection.py
+    │   ├── preprocessing.py
+    │   ├── validation.py
+    │   └── llm_batch.py
+
     ├── deep_learning/
-    │   ├── model.py                    # DNN architecture only
-    │   └── inference.py                # checkpoint loading + inference
-    │
+    │   ├── model.py
+    │   └── inference.py
+
     ├── ml/
     │   ├── ensemble/
-    │   │   ├── ensemble.py             # weighted model combination
-    │   │   └── business_metrics.py     # deal gap/business calculations
     │   └── evaluation/
-    │       └── metrics.py              # reusable pure ML metrics
-    │
+
     ├── integrations/
-    │   └── modal_service.py             # remote fine-tuned model adapter
-    │
+    │   └── modal_service.py
+
     ├── rag/
-    │   ├── config.py
-    │   ├── schemas.py
-    │   ├── prompts.py
     │   ├── loader.py
     │   ├── splitter.py
     │   ├── embeddings.py
@@ -70,353 +331,252 @@ src/
     │   ├── reranker.py
     │   ├── llm.py
     │   ├── services/
-    │   │   ├── answer.py                # complete answer pipeline
-    │   │   └── ingest.py                # explicit RAG index build
     │   └── evaluation/
-    │       ├── metrics.py               # retrieval + price metrics
-    │       ├── evaluator.py             # everything before the dashboard
-    │       └── dashboard.py             # Gradio UI only
+
+    ├── utils/
     │
-    └── utils/
-        ├── paths.py
-        └── logging.py
+    └── config.py
 ```
 
-## 2. Why `data` is split by responsibility
+Research notebooks are kept separately from reusable application code.
 
-The data layer is **not** one giant `data.py` file and it is also **not** split into one file per notebook cell.
+---
 
-The boundary is the responsibility:
+## Research vs Application Code
 
-```text
-collection.py       -> obtain source data
-preprocessing.py    -> deterministic cleaning + feature engineering
-validation.py       -> validate data before downstream use
-models.py           -> stable product representation
-llm_batch.py        -> expensive batch preparation/execution
-```
+The project intentionally separates experimentation from reusable runtime logic.
 
-EDA does not become `eda.py` just because an EDA notebook exists. Charts, distributions, correlation checks, and exploratory observations are research artifacts unless they become part of a real production data-quality or monitoring requirement.
+### Research notebooks
 
-## 3. RAG architecture
+The notebooks contain:
 
-RAG is intentionally more granular because the pipeline already contains distinct responsibilities:
+- Exploratory Data Analysis
+- Model experiments
+- Cross-validation
+- Hyperparameter tuning
+- Neural network training
+- Fine-tuning experiments
+- Model comparisons
+- Experimental visualizations
 
-```text
-Question
-   |
-   v
-get_query
-   |
-   v
-query rewriting -----------+
-   |                        |
-   +---- original ----------+---- rewritten
-             |                       |
-             v                       v
-        HybridRetriever        HybridRetriever
-        (dense + BM25)         (dense + BM25)
-             \                       /
-              +------ merge --------+
-                         |
-                         v
-                     reranker
-                         |
-                         v
-                   top-k context
-                         |
-                         v
-                 structured LLM
-                         |
-                         v
-                    RAGAnswer
-```
+### Source package
 
-### RAG module responsibilities
+The `src` package contains reusable logic required by the application:
 
-`embeddings.py` handles embeddings only.
-
-`vectorstore.py` handles Chroma persistence and dense search only.
-
-`bm25.py` handles sparse retrieval only.
-
-`retriever.py` combines dense and sparse retrieval with Reciprocal Rank Fusion.
-
-`reranker.py` handles the ranking stage.
-
-`llm.py` handles query rewriting, reranking structured output, and price estimation.
-
-`services/answer.py` is the orchestration layer that calls those components in the correct sequence.
-
-`services/ingest.py` is an explicit build operation. It is **not** run when the Gradio app starts.
-
-This separation is important for future FastAPI, Cron, Docker, and Azure deployment because those components can reuse `RAGAnswerService` without importing Gradio.
-
-## 4. RAG evaluation architecture
-
-The evaluation notebook is intentionally **not** converted into one giant function.
-
-Everything that happens before the dashboard is moved into `RAGEvaluator`:
-
-```text
-Load frozen golden dataset
-        |
-Validate dataset integrity
-        |
-Evaluate one case
-        |
-Run RAGAnswerService
-        |
-Calculate retrieval metrics
-        |
-Calculate price metrics
-        |
-Checkpoint every case
-        |
-Resume after interruption
-        |
-Aggregate overall/category metrics
-        |
-Persist CSV
-        |
-        v
-   dashboard.py
-        |
-        v
-      Gradio
-```
-
-This gives us two clean entry points later:
-
-```python
-from best_deal.rag.evaluation.evaluator import RAGEvaluator
-
-RAGEvaluator().run()
-```
-
-and, separately:
-
-```python
-from best_deal.rag.evaluation.dashboard import launch_dashboard
-
-launch_dashboard()
-```
-
-The second one is UI. The first one can later be called from CI, a scheduled evaluation job, or an admin backend.
-
-## 5. What stays in notebooks
-
-### Stays as research/offline work
-
-- EDA and exploratory plots
-- Baseline model training
-- Cross-validation experiments
-- Hyperparameter tuning experiments
-- Model comparison experiments
-- Neural-network training
-- Fine-tuning training
-- Fine-tuning cloud execution
-- One-off experiment visualizations
-- Embedding visualization such as t-SNE
-
-### Converted into reusable source modules
-
-- Data collection logic
-- Deterministic data preprocessing and feature engineering
+- Data processing
 - Data validation
-- LLM batch preparation helpers
-- DNN architecture needed for inference
-- DNN inference
-- Modal remote-model adapter
-- Agent implementations
-- Ensemble combination
-- RAG ingestion
-- RAG retrieval
-- RAG reranking
-- RAG final answer service
-- RAG evaluation execution and metrics
-- Gradio application orchestration
+- Model inference
+- RAG
+- Agent orchestration
+- Ensemble logic
+- Deal evaluation
+- Notifications
+- Evaluation pipelines
+- Application startup
 
-## 6. Fine-tuned model decision
+This separation prevents the application from depending on notebook execution.
 
-The fine-tuned model is **not retrained as part of this migration**.
+---
 
-Training is already completed remotely. Rewriting the project from notebook code into `src` does not justify spending the training cost again.
+## Running the Project
 
-The source stage therefore contains only:
+### 1. Clone the repository
 
-```text
-agents/specialist_agent.py
-        |
-        v
-integrations/modal_service.py
-        |
-        v
-existing remote Modal Pricer
+```bash
+git clone <repository-url>
+cd Best_Deal
 ```
 
-The training notebook remains the historical record of how the model was produced.
+### 2. Create a virtual environment
 
-## 7. DNN artifact decision
-
-The DNN inference architecture is source code, but the checkpoint is not committed:
-
-```text
-src/best_deal/deep_learning/model.py
-src/best_deal/deep_learning/inference.py
-
-external artifact:
-artifacts/models/deep_neural_network.pth
+```bash
+python -m venv .venv
 ```
 
-The `.pth` file is ignored by Git because it is a large model artifact.
+On Windows:
 
-The path can be supplied with:
-
-```text
-BEST_DEAL_DNN_WEIGHTS=artifacts/models/deep_neural_network.pth
+```bash
+.venv\Scripts\activate
 ```
 
-This also makes the project suitable for later Docker/Azure artifact storage instead of baking a large checkpoint into Git history.
+### 3. Install dependencies
 
-## 8. No machine-specific paths
-
-Paths from notebooks such as local Windows paths, notebook-relative path hacks, or `/kaggle/...` paths are not used in source.
-
-The project root is resolved from the package location, and environment variables can override artifact locations.
-
-Use:
-
-```python
-from best_deal.config import PROJECT_ROOT
+```bash
+pip install -r requirements.txt
 ```
 
-instead of hardcoding a developer's local directory.
-
-## 9. Absolute imports only
-
-The source package intentionally uses imports like:
-
-```python
-from best_deal.rag.services.answer import RAGAnswerService
-from best_deal.agents.framework import DealAgentFramework
-```
-
-It does not use:
-
-```python
-sys.path.insert(...)
-from answer import ...
-from agents... import ...
-```
-
-That is deliberate. Absolute package imports are the cleaner base for future Cron jobs, workers, Docker images, FastAPI processes, and Azure deployment.
-
-Install the package in editable mode during development:
+Install the project in editable mode:
 
 ```bash
 pip install -e .
 ```
 
-Run the application as a module:
+### 4. Configure environment variables
+
+Create a `.env` file based on `.env.example`.
+
+Depending on the components being used, the application may require credentials for:
+
+- LLM providers
+- Modal
+- Pushover
+- RAG services
+
+Secrets are not committed to Git.
+
+### 5. Run the application
 
 ```bash
 python -m best_deal.main
 ```
 
-## 10. Runtime behavior
+The current interface is built with Gradio.
 
-The Gradio entry point is still the main demo/application entry point:
+---
+
+## Model Artifacts
+
+Large model artifacts are intentionally excluded from Git.
+
+For example:
 
 ```text
-main.py
-      |
-      v
-DealAgentFramework
-      |
-      v
-AutonomousPlanningAgent
-      |
-      +--> ScannerAgent
-      |
-      +--> EnsembleAgent
-      |       +--> Preprocessor
-      |       +--> FrontierAgent -> RAGAnswerService
-      |       +--> SpecialistAgent -> Modal
-      |       +--> NeuralNetworkAgent -> .pth artifact
-      |
-      +--> MessagingAgent -> Pushover
+artifacts/
+└── models/
+    └── deep_neural_network.pth
 ```
 
-The current five-minute Gradio timer is preserved.
+The fine-tuned model is hosted remotely and accessed through its integration layer.
 
-RAG ingestion, RAG evaluation, model training, and fine-tuning are **not** accidentally triggered by application startup.
+This keeps the repository lightweight and allows model artifacts to be moved later to dedicated cloud storage.
 
-## 11. Existing logic that was corrected during migration
+---
 
-A source migration is not just a copy/paste operation. The following issues were cleaned while preserving the intended workflow:
+## Current Status
 
-- `NeuralNetworkAgent` no longer imports a nonexistent `agents.deep_neural_network` module. It uses the actual DNN inference module.
-- `FrontierAgent` no longer duplicates the complete RAG implementation. It delegates to `RAGAnswerService`.
-- RAG duplicate notebook definitions are consolidated into single source implementations.
-- RAG dense and sparse retrieval now use the same stable product identifier so RRF fusion can actually match results from both stores.
-- Autonomous planner messages are initialized per run instead of relying on accidental instance state.
-- Logging handlers used by the Gradio UI are removed after a run to avoid accumulating duplicate handlers.
-- Machine-specific filesystem paths are removed.
+### Completed
 
-## 12. Git policy
+- Data collection and preprocessing pipeline
+- Classical ML experiments
+- Deep Neural Network
+- Fine-tuned pricing model
+- RAG pricing pipeline
+- RAG evaluation pipeline
+- Multi-agent architecture
+- Ensemble pricing
+- Deal evaluation
+- Pushover notification integration
+- Gradio application
+- Modular `src` architecture
 
-The repository does not commit:
+### Current Development
 
-- `.env` and secrets
-- Local SQLite/database files
-- runtime memory
-- large `.pth`, `.pt`, `.ckpt`, `.bin`, `.safetensors`, and `.onnx` model artifacts
-- pickled caches
-- Chroma/BM25 generated indexes
-- W&B experiment directories
-- temporary batch outputs
-- notebook checkpoints
+The project is now moving from an AI/ML research application toward a production-oriented software system.
 
-`.env.example` contains placeholders only.
+The next engineering layer includes:
 
-## 13. Stage 1 migration map
+- Backend API
+- Persistent database
+- User accounts
+- User preferences
+- Personalized deal selection
+- Product watchlists
+- Scheduled deal scanning
+- Production notification management
 
-| Original notebook/file | Source destination | Decision |
-| --- | --- | --- |
-| `01_data_collection.ipynb` | `data/collection.py` | Reusable collection logic extracted |
-| `02_data_preprocessing.ipynb` | `data/preprocessing.py` | Cleaning/features extracted, EDA stays notebook |
-| `03_llm_batch_preparation.ipynb` | `data/llm_batch.py` | Explicit batch helpers extracted |
-| `04_fine_tuning_preprossing.ipynb` | notebook | Historical training preparation, no runtime startup use |
-| ML baseline notebooks | notebooks | Training/experiments stay offline |
-| NN/DNN notebooks | `deep_learning/model.py` + `inference.py` | Inference architecture extracted, checkpoint external |
-| fine-tuning notebooks | `integrations/modal_service.py` + `specialist_agent.py` | Remote runtime adapter only |
-| `01_RAG_answer.ipynb` | `rag/*` + `rag/services/answer.py` | Full reusable RAG flow extracted |
-| `05_RAG_ingestion.ipynb` | `rag/services/ingest.py` + supporting modules | Explicit build workflow extracted, EDA stays notebook |
-| `02_RAG_evaluation.ipynb` | `rag/evaluation/evaluator.py` + `dashboard.py` | Pre-dashboard execution separated from UI |
-| existing agent source | `agents/*` | Converted to package modules with absolute imports |
-| existing `main.py` | `best_deal/main.py` | Remains application entry point |
+---
 
-## 14. Validation strategy for this stage
+## Roadmap
 
-This stage is validated in layers:
+```text
+AI / ML Research
+       |
+       v
+Modular Source Architecture   <-- Current Stage
+       |
+       v
+FastAPI
+       |
+       v
+PostgreSQL / Supabase
+       |
+       +---- Users
+       +---- Products
+       +---- Price History
+       +---- Deals
+       +---- Watchlists
+       +---- Notifications
+       |
+       v
+Scheduled Workers / Cron
+       |
+       v
+Next.js Dashboard
+       |
+       v
+Docker
+       |
+       v
+CI/CD
+       |
+       v
+Azure Deployment
+```
 
-1. Python syntax compilation across the whole `src` tree.
-2. Absolute-import and machine-path scan.
-3. Module/function docstring checks.
-4. Pure-function smoke tests for ensemble and metrics.
-5. Full runtime verification in the project's real environment, where OpenAI, Chroma, LiteLLM, BM25, Modal, the DNN checkpoint, and secrets are available.
+The architecture is intentionally being built incrementally so that the existing AI/ML components can be reused by the future backend, scheduled jobs, and user-facing applications.
 
-Because the source stage deliberately excludes the large model checkpoint and generated RAG indexes, a completely fresh environment cannot reproduce the full live pipeline until those external artifacts and credentials are supplied.
+---
 
-## 15. Current scope versus later stages
+## Documentation
 
-### Stage 1, this migration
+More detailed technical documentation is available in the [`docs/`](docs/) directory.
 
-`src` package + clean modules + Gradio entry point + reusable RAG + source-level evaluation + configuration + packaging.
+- [Project Overview](docs/project_overview.md)
+- [ML Pipeline](docs/ml_pipeline.md)
+- [Experiments](docs/experiments.md)
 
-### Later stages
+Additional architecture and deployment documentation will be added as those stages are implemented.
 
-FastAPI, PostgreSQL/Supabase, authentication and RBAC, user preferences, watchlists, scheduled jobs, production notification routing, Next.js/TypeScript, admin dashboard, Docker, CI/CD, Azure deployment, tests, observability, and database-backed repositories.
+---
 
-The architecture in this stage is intentionally prepared for those additions without putting those technologies into the codebase prematurely.
+## Engineering Focus
+
+Best Deal is being developed as an end-to-end engineering project rather than only a machine-learning experiment.
+
+The long-term workflow is:
+
+```text
+Data Engineering
+      ↓
+Machine Learning
+      ↓
+Deep Learning
+      ↓
+LLMs / RAG
+      ↓
+Multi-Agent Systems
+      ↓
+Software Architecture
+      ↓
+Backend Engineering
+      ↓
+Database Design
+      ↓
+Testing
+      ↓
+Docker
+      ↓
+CI/CD
+      ↓
+Cloud Deployment
+```
+
+The goal is to turn an AI research pipeline into a maintainable, testable, and deployable software product.
+
+---
+
+## Project Status
+
+**Current stage:** AI/ML core → modular application architecture
+
+Best Deal is actively under development.
